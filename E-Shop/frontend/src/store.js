@@ -3,33 +3,26 @@ import thunk from 'redux-thunk';
 import { cartReducer } from './reducers/cartReducers';
 import {
   orderCreateReducer,
-  // orderDeleteReducer,
-  // orderDeliverReducer,
+  orderDeleteReducer,
+  orderDeliverReducer,
   orderDetailsReducer,
-  // orderListReducer,
-  // orderMineListReducer,
-  // orderPayReducer,
-  // orderSummaryReducer,
+  orderListReducer,
+  orderMineListReducer,
+  orderPayReducer,
+  orderSummaryReducer,
 } from './reducers/orderReducers';
 import {
-  // productCategoryListReducer,
-  // productCreateReducer,
-  // productDeleteReducer,
+  productCreateReducer,
+  productDeleteReducer,
   productDetailsReducer,
   productListReducer,
-  // productReviewCreateReducer,
-  // productUpdateReducer,
+  productUpdateReducer,
 } from './reducers/productReducer';
 import {
-  // userAddressMapReducer,
-  // userDeleteReducer,
-  // userDetailsReducer,
-  // userListReducer,
+  userDetailsReducer,
   userRegisterReducer,
   userSigninReducer,
-  // userTopSellerListReducer,
-  // userUpdateProfileReducer,
-  // userUpdateReducer,
+  userUpdateProfileReducer,
 } from './reducers/userReducer';
 
 const initialState = {
@@ -45,7 +38,7 @@ const initialState = {
     shippingAddress: localStorage.getItem('shippingAddress')
       ? JSON.parse(localStorage.getItem('shippingAddress'))
       : {},
-    paymentMethod: 'cash',
+    paymentMethod: 'cash on delivery',
   },
  };
 const reducer = combineReducers({
@@ -57,24 +50,17 @@ const reducer = combineReducers({
   userRegister: userRegisterReducer,
   orderCreate: orderCreateReducer,
   orderDetails: orderDetailsReducer,
-//   orderPay: orderPayReducer,
-//   orderMineList: orderMineListReducer,
-//   userDetails: userDetailsReducer,
-//   userUpdateProfile: userUpdateProfileReducer,
-//   userUpdate: userUpdateReducer,
-//   productCreate: productCreateReducer,
-//   productUpdate: productUpdateReducer,
-//   productDelete: productDeleteReducer,
-//   orderList: orderListReducer,
-//   orderDelete: orderDeleteReducer,
-//   orderDeliver: orderDeliverReducer,
-//   userList: userListReducer,
-//   userDelete: userDeleteReducer,
-//   userTopSellersList: userTopSellerListReducer,
-//   productCategoryList: productCategoryListReducer,
-//   productReviewCreate: productReviewCreateReducer,
-//   userAddressMap: userAddressMapReducer,
-//   orderSummary: orderSummaryReducer,
+  orderPay: orderPayReducer,
+  orderMineList: orderMineListReducer,
+  userDetails: userDetailsReducer,
+  userUpdateProfile: userUpdateProfileReducer,
+  productCreate: productCreateReducer,
+  productUpdate: productUpdateReducer,
+  productDelete: productDeleteReducer,
+  orderList: orderListReducer,
+  orderDelete: orderDeleteReducer,
+  orderDeliver: orderDeliverReducer,
+  orderSummary: orderSummaryReducer,
 });
 
 

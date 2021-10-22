@@ -1,18 +1,57 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState  } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { detailsOrder } from '../actions/orderActions';
+import { deliverOrder, detailsOrder, payOrder } from '../actions/orderActions';
 import LoadingBox from '../components/LoadingBox';
 import MessageBox from '../components/MessageBox';
+import {
+  ORDER_DELIVER_RESET,
+  ORDER_PAY_RESET,
+} from '../constants/orderConstants';
 
 export default function OrderScreen(props) {
   const orderId = props.match.params.id;
+  const [sdkReady, setSdkReady] = useState(false);
   const orderDetails = useSelector((state) => state.orderDetails);
   const { order, loading, error } = orderDetails;
+  const userSignin = useSelector((state) => state.userSignin);
+  const { userInfo } = userSignin;
+
+  const orderPay = useSelector((state) => state.orderPay);
+  const {
+    loading: loadingPay,
+    error: errorPay,
+    success: successPay,
+  } = orderPay;
+  const orderDeliver = useSelector((state) => state.orderDeliver);
+  const {
+    loading: loadingDeliver,
+    error: errorDeliver,
+    success: successDeliver,
+  } = orderDeliver;
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(detailsOrder(orderId));
-  }, [dispatch, orderId]);
+    if (
+      !order ||
+      successPay ||
+      successDeliver ||
+      (order && order._id !== orderId)
+    ) {
+      dispatch({ type: ORDER_PAY_RESET });
+      dispatch({ type: ORDER_DELIVER_RESET });
+      dispatch(detailsOrder(orderId));
+    } else {
+      if (!order.isPaid) {
+          setSdkReady(true);
+      }
+    }
+  }, [dispatch, orderId, sdkReady, successPay, successDeliver, order]);
+  const successPaymentHandler = (paymentResult) => {
+    dispatch(payOrder(order, paymentResult));
+  };
+  const deliverHandler = () => {
+    dispatch(deliverOrder(order._id));
+  };
   return loading ? (
     <LoadingBox></LoadingBox>
   ) : error ? (
@@ -25,12 +64,13 @@ export default function OrderScreen(props) {
           <ul>
             <li>
               <div className="card card-body">
-                <h2>Shipping</h2>
+                <h2>Shippring</h2>
                 <p>
                   <strong>Name:</strong> {order.shippingAddress.fullName} <br />
-                  <strong>Mobile:</strong> {order.shippingAddress.mobile} <br />
                   <strong>Address: </strong> {order.shippingAddress.address},
-                  {order.shippingAddress.city}, {order.shippingAddress.postalCode}
+                  {order.shippingAddress.city},{' '}
+                  {order.shippingAddress.postalCode},
+                  {order.shippingAddress.country}
                 </p>
                 {order.isDelivered ? (
                   <MessageBox variant="success">
@@ -115,6 +155,40 @@ export default function OrderScreen(props) {
                   </div>
                 </div>
               </li>
+              {!order.isPaid && (
+                <li>
+                  {!sdkReady ? (
+                    <LoadingBox></LoadingBox>
+                  ) : (
+                    <>
+                      {errorPay && (
+                        <MessageBox variant="danger">{errorPay}</MessageBox>
+                      )}
+                      {loadingPay && <LoadingBox></LoadingBox>}
+
+                     
+                        amount={order.totalPrice}
+                        onSuccess={successPaymentHandler}
+                    
+                    </>
+                  )}
+                </li>
+              )}
+              {userInfo.isAdmin && !order.isDelivered && (
+                <li>
+                  {loadingDeliver && <LoadingBox></LoadingBox>}
+                  {errorDeliver && (
+                    <MessageBox variant="danger">{errorDeliver}</MessageBox>
+                  )}
+                  <button
+                    type="button"
+                    className="primary block"
+                    onClick={deliverHandler}
+                  >
+                    Deliver Order
+                  </button>
+                </li>
+              )}
             </ul>
           </div>
         </div>
